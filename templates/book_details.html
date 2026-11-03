@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} | My Bookshelf{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{url_for('static', filename='css/book-details.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div class="book-detail-page">
+
+    <!-- Back Link -->
+    <a href="{{ url_for('library') }}" class="book-detail-back">
+        ← Back to Library
+    </a>
+
+
+    <section class="book-detail-hero">
+
+        <!-- Cover -->
+        <div class="book-detail-cover">
+
+            {% if book.cover_image %}
+                <img
+                    src="{{ url_for('static', filename=book.cover_image) }}"
+                    alt="Cover of {{ book.title }}"
+                >
+            {% else %}
+                <div class="book-detail-cover-placeholder">
+                    <span>No Cover</span>
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- Information -->
+        <div class="book-detail-info">
+
+            <!-- Genres -->
+            {% if genres %}
+                <div class="book-detail-genres">
+                    {% for genre in genres %}
+                        <span>{{ genre.name }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+
+            <!-- Title -->
+            <h1 class="book-detail-title">
+                {{ book.title }}
+            </h1>
+
+
+            <!-- Authors -->
+            <p class="book-detail-author">
+
+                {% if authors %}
+                    by
+                    {% for author in authors %}
+                        {{ author.first_name }} {{ author.last_name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                {% else %}
+                    Unknown Author
+                {% endif %}
+
+            </p>
+
+
+            <!-- Metadata -->
+            <div class="book-detail-metadata">
+
+                <div class="book-meta-item">
+                    <span class="book-meta-label">Publisher</span>
+                    <span class="book-meta-value">
+                        {{ book.publisher_name or "Unknown" }}
+                    </span>
+                </div>
+
+                <div class="book-meta-item">
+                    <span class="book-meta-label">Published</span>
+                    <span class="book-meta-value">
+                        {{ book.publication_year or "—" }}
+                    </span>
+                </div>
+
+                <div class="book-meta-item">
+                    <span class="book-meta-label">ISBN</span>
+                    <span class="book-meta-value">
+                        {{ book.isbn or "—" }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- Description -->
+            <div class="book-detail-description">
+
+                <h2>About the Book</h2>
+
+                {% if book.description %}
+                    <p>{{ book.description }}</p>
+                {% else %}
+                    <p class="book-detail-empty">
+                        No description has been added.
+                    </p>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Actions -->
+            <div class="book-detail-actions">
+
+                <a
+                    href="{{ url_for('edit_book', book_id=book.book_id) }}"
+                    class="book-detail-edit"
+                >
+                    Edit Book
+                </a>
+
+                <form
+                    action="{{ url_for('delete_book', book_id=book.book_id) }}"
+                    method="POST"
+                    class="book-detail-delete-form"
+                    onsubmit="return confirm('Are you sure you want to delete this book?');"
+                >
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button
+                        type="submit"
+                        class="book-detail-delete"
+                    >
+                        Delete Book
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Physical Copies -->
+    <section class="book-copies-section">
+
+        <div class="book-copies-heading">
+
+            <div>
+                <span class="section-eyebrow">COLLECTION</span>
+                <h2>My Copies</h2>
+            </div>
+
+            <span class="copy-count">
+                {{ copies|length }}
+                {% if copies|length == 1 %}
+                    copy
+                {% else %}
+                    copies
+                {% endif %}
+            </span>
+
+        </div>
+
+
+        {% if copies %}
+
+            <div class="book-copies-list">
+
+                {% for copy in copies %}
+
+                    <article class="book-copy-card">
+
+                        <div class="copy-card-top">
+
+                            <span class="copy-number">
+                                COPY {{ loop.index }}
+                            </span>
+
+                            {% if copy.format %}
+                                <span class="copy-format">
+                                    {{ copy.format }}
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="copy-information">
+
+                            <div class="copy-info-item">
+                                <span class="copy-info-label">Shelf</span>
+                                <span class="copy-info-value">
+                                    {{ copy.shelf_name or "Unassigned" }}
+                                </span>
+                            </div>
+
+                            <div class="copy-info-item">
+                                <span class="copy-info-label">Condition</span>
+                                <span class="copy-info-value">
+                                    {{ copy.condition or "—" }}
+                                </span>
+                            </div>
+
+                            <div class="copy-info-item">
+                                <span class="copy-info-label">Purchased</span>
+                                <span class="copy-info-value">
+                                    {{ copy.purchase_date or "—" }}
+                                </span>
+                            </div>
+
+                            <div class="copy-info-item">
+                                <span class="copy-info-label">Price</span>
+                                <span class="copy-info-value">
+
+                                    {% if copy.purchase_price is not none %}
+                                        ${{ "%.2f"|format(copy.purchase_price) }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                </span>
+                            </div>
+
+                        </div>
+
+                        {% if copy.notes %}
+
+                            <div class="copy-notes">
+                                <span class="copy-info-label">Notes</span>
+                                <p>{{ copy.notes }}</p>
+                            </div>
+
+                        {% endif %}
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="book-copies-empty">
+                <p>No physical copies have been added for this book.</p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}
+

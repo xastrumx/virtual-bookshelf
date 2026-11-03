@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Virtual Bookshelf{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Main Stylesheet -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+
+<body>
+    
+    <!-- Naviagation -->
+    <header class="site-header">
+
+        <div class="nav-container">
+
+            <!-- Logo -->
+            <a class="site-logo" href="{{ url_for('home') }}">
+                MY BOOKSHELF
+            </a>
+
+
+            <!-- Mobile Menu Button -->
+            <button
+                class="nav-toggle"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+
+            <!-- Navigation Links -->
+            <nav class="main-nav">
+
+                <a 
+                href="{{ url_for('home') }}"
+                class="{% if request.endpoint == 'home' %}active{% endif %}"
+                >
+                    Home
+                </a>
+
+                <a 
+                href="{{ url_for('bookshelf') }}"
+                class="{% if request.endpoint == 'bookshelf' %}active{% endif %}"
+                >
+                    Bookshelf
+                </a>
+
+                <a 
+                href="{{ url_for('library') }}"
+                class="{% if request.endpoint in ['library', 'book_details', 'edit_book'] %}active{% endif %}"
+                >
+                    Library
+                </a>
+
+                <a 
+                href="{{ url_for('authors') }}"
+                class="{% if request.endpoint in ['authors', 'author_details'] %}active{% endif %}"
+                >
+                    Authors
+                </a>
+
+                <a
+                href="{{ url_for('add_book') }}"
+                class="nav-add-book{% if request.endpoint == 'add_book' %} active{% endif %}"
+                >
+                    Add Book
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main class="site-main">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages" aria-live="polite">
+                    {% for category, message in messages %}
+                        <p class="flash-message flash-message-{{ category }}">
+                            {{ message }}
+                        </p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+
+    <!-- Mobile Nav -->
+    <script>
+
+        const navToggle = document.querySelector(".nav-toggle");
+        const mainNav = document.querySelector(".main-nav");
+
+        navToggle.addEventListener("click", () => {
+
+            mainNav.classList.toggle("active");
+
+            const isOpen = mainNav.classList.contains("active");
+
+            navToggle.setAttribute(
+                "aria-expanded",
+                isOpen
+            );
+
+        });
+
+    </script>
+
+
+    {% block scripts %}{% endblock %}
+
+</body>
+
+</html>

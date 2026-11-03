@@ -1,0 +1,515 @@
+{% extends "base.html" %}
+
+{% block title %}
+Library | Virtual Bookshelf
+{% endblock %}
+
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/library.css') }}"
+>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="library-page">
+
+    <!-- Page Header -->
+    <section class="library-header">
+
+        <div>
+            <p class="library-eyebrow">PERSONAL COLLECTION</p>
+
+            <h1 class="page-title">My Library</h1>
+        </div>
+
+        <div class="library-count">
+            <span>{{ total_items }}</span>
+            <p>BOOKS</p>
+        </div>
+
+    </section>
+
+
+    <!-- Search and Filters -->
+    <section class="library-controls">
+
+        <form
+            class="library-filter-form"
+            method="GET"
+            action="{{ url_for('library') }}"
+        >
+
+            <!-- Search -->
+            <div class="search-group">
+
+                <label for="search">
+                    Search Collection
+                </label>
+
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Search books, authors, ISBN, or publishers..."
+                >
+
+            </div>
+
+
+            <!-- Filters -->
+            <div class="filter-grid">
+
+                <div class="filter-group">
+
+                    <label for="genre_id">
+                        Genre
+                    </label>
+
+                    <select id="genre_id" name="genre_id">
+
+                        <option value="">
+                            All Genres
+                        </option>
+
+                        {% for genre in genres %}
+
+                            <option
+                                value="{{ genre.genre_id }}"
+                                {% if genre_id == genre.genre_id %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ genre.name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label for="publisher_id">
+                        Publisher
+                    </label>
+
+                    <select id="publisher_id" name="publisher_id">
+
+                        <option value="">
+                            All Publishers
+                        </option>
+
+                        {% for publisher in publishers %}
+
+                            <option
+                                value="{{ publisher.publisher_id }}"
+                                {% if publisher_id == publisher.publisher_id %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ publisher.name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label for="shelf_id">
+                        Shelf
+                    </label>
+
+                    <select id="shelf_id" name="shelf_id">
+
+                        <option value="">
+                            All Shelves
+                        </option>
+
+                        {% for shelf in shelves %}
+
+                            <option
+                                value="{{ shelf.shelf_id }}"
+                                {% if shelf_id == shelf.shelf_id %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ shelf.name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label for="format">
+                        Format
+                    </label>
+
+                    <select id="format" name="format">
+
+                        <option value="">
+                            All Formats
+                        </option>
+
+                        {% for format in formats %}
+
+                            <option
+                                value="{{ format.format }}"
+                                {% if book_format == format.format %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ format.format }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label for="sort">
+                        Sort By
+                    </label>
+
+                    <select id="sort" name="sort">
+
+                        <option
+                            value="title_asc"
+                            {% if sort == "title_asc" %}
+                                selected
+                            {% endif %}
+                        >
+                            Title: A - Z
+                        </option>
+
+                        <option
+                            value="title_desc"
+                            {% if sort == "title_desc" %}
+                                selected
+                            {% endif %}
+                        >
+                            Title: Z - A
+                        </option>
+
+                        <option
+                            value="year_desc"
+                            {% if sort == "year_desc" %}
+                                selected
+                            {% endif %}
+                        >
+                            Newest First
+                        </option>
+
+                        <option
+                            value="year_asc"
+                            {% if sort == "year_asc" %}
+                                selected
+                            {% endif %}
+                        >
+                            Oldest First
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- Filter Actions -->
+            <div class="filter-actions">
+
+                <a
+                    class="clear-filters"
+                    href="{{ url_for('library') }}"
+                >
+                    Clear
+                </a>
+
+                <button
+                    class="apply-filters"
+                    type="submit"
+                >
+                    Apply Filters
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- Collection -->
+<section class="library-collection">
+
+    <div class="collection-header">
+
+        <div>
+            <p class="library-eyebrow">
+                PERSONAL LIBRARY
+            </p>
+
+            <h1>Complete Collection</h1>
+
+            <p class="collection-description">
+                A comprehensive index of your personal library,
+                sorted and categorized for easy retrieval.
+            </p>
+        </div>
+
+
+        <p class="collection-count">
+            Showing {{ start_item }}–{{ end_item }}
+            of {{ total_items }} items
+        </p>
+
+    </div>
+
+
+    {% if books %}
+
+        <div class="library-table-wrapper">
+
+            <table class="library-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Genre</th>
+                        <th>Format</th>
+                        <th>Publisher</th>
+                        <th>Date Added</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for book in books %}
+
+                        <tr>
+
+                            <!-- Title -->
+                            <td>
+
+                                <a
+                                    class="library-book-title"
+                                    href="{{ url_for(
+                                        'book_details',
+                                        book_id=book['book_id']
+                                    ) }}"
+                                >
+
+                                    {% if book["cover_image"] %}
+
+                                        <img
+                                            src="{{ url_for('static', filename=book.cover_image) }}"
+                                            alt="{{ book['title'] }} cover"
+                                        >
+
+                                    {% else %}
+
+                                        <div class="table-cover-placeholder">
+                                            —
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    <span>
+                                        {{ book["title"] }}
+                                    </span>
+
+                                </a>
+
+                            </td>
+
+
+                            <!-- Author -->
+                            <td>
+                                {{ book["authors"] or "—" }}
+                            </td>
+
+
+                            <!-- Genre -->
+                            <td>
+                                {{ book["genres"] or "—" }}
+                            </td>
+
+
+                            <!-- Format -->
+                            <td>
+
+                                {% if book["formats"] %}
+
+                                    <span class="format-tag">
+                                        {{ book["formats"] }}
+                                    </span>
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Publisher -->
+                            <td>
+                                {{ book["publisher_name"] or "—" }}
+                            </td>
+
+
+                            <!-- Date Added -->
+                            <td>
+
+                                {% if book["date_added"] %}
+
+                                    {{ book["date_added"].strftime(
+                                        "%b %d, %Y"
+                                    ) }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- Pagination -->
+
+        {% if total_pages > 1 %}
+
+            <nav
+                class="pagination"
+                aria-label="Library pages"
+            >
+
+                {% if page > 1 %}
+
+                    <a
+                        class="pagination-button"
+                        href="{{ url_for(
+                            'library',
+                            page=page - 1,
+                            search=search,
+                            genre_id=genre_id,
+                            publisher_id=publisher_id,
+                            shelf_id=shelf_id,
+                            format=book_format,
+                            sort=sort
+                        ) }}"
+                    >
+                        ‹
+                    </a>
+
+                {% endif %}
+
+
+                {% for page_number in range(
+                    1,
+                    total_pages + 1
+                ) %}
+
+                    <a
+                        class="pagination-button
+                        {% if page_number == page %}
+                            active
+                        {% endif %}"
+                        href="{{ url_for(
+                            'library',
+                            page=page_number,
+                            search=search,
+                            genre_id=genre_id,
+                            publisher_id=publisher_id,
+                            shelf_id=shelf_id,
+                            format=book_format,
+                            sort=sort
+                        ) }}"
+                    >
+                        {{ page_number }}
+                    </a>
+
+                {% endfor %}
+
+
+                {% if page < total_pages %}
+
+                    <a
+                        class="pagination-button"
+                        href="{{ url_for(
+                            'library',
+                            page=page + 1,
+                            search=search,
+                            genre_id=genre_id,
+                            publisher_id=publisher_id,
+                            shelf_id=shelf_id,
+                            format=book_format,
+                            sort=sort
+                        ) }}"
+                    >
+                        ›
+                    </a>
+
+                {% endif %}
+
+            </nav>
+
+        {% endif %}
+
+
+    {% else %}
+
+        <div class="empty-library">
+
+            <h2>No books found</h2>
+
+            <p>
+                Try changing your search or filters.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+# Local environment and secrets
+.env*
+!.env.example
+.direnv/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python caches and generated files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.egg-info/
+.eggs/
+build/
+dist/
+.ipynb_checkpoints/
+
+# Flask runtime data
+instance/
+
+# Logs and local database/backups
+*.log
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.backup
+*.sql.gz
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Uploaded covers contain personal library data. Back them up separately.
+static/covers/*
+!static/covers/.gitkeep

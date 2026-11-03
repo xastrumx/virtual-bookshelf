@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ book.title }} | My Bookshelf{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/book-form.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div class="book-form-page">
+
+    <header class="book-form-header">
+
+        <span class="form-eyebrow">
+            EDIT LIBRARY RECORD
+        </span>
+
+        <h1>Edit Book</h1>
+
+        <p>
+            Update the catalog information for
+            <strong>{{ book.title }}</strong>.
+        </p>
+
+    </header>
+
+    <form
+        method="POST"
+        action="{{ url_for('edit_book', book_id=book.book_id) }}"
+        class="book-form"
+        enctype="multipart/form-data"
+    >
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <section class="form-section">
+
+            <div class="form-section-heading">
+
+                <span>01</span>
+
+                <div>
+                    <h2>Book Information</h2>
+                    <p>
+                        Update publication and catalog details.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <!-- Title -->
+                <div class="form-field form-field-full">
+
+                    <label for="title">
+                        Title
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        value="{{ book.title }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- ISBN -->
+                <div class="form-field">
+
+                    <label for="isbn">
+                        ISBN
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="isbn"
+                        name="isbn"
+                        value="{{ book.isbn or '' }}"
+                        maxlength="13"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Publication Year -->
+                <div class="form-field">
+
+                    <label for="publication_year">
+                        Publication Year
+                    </label>
+
+                    <input
+                        type="text"
+                        id="publication_year"
+                        name="publication_year"
+                        value="{{ book.publication_year or '' }}"
+                        inputmode="numeric"
+                        maxlength="4"
+                        pattern="[0-9]{4}"
+                        title="Enter a four-digit year"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)"
+                    >
+
+                </div>
+
+
+                <!-- Publisher -->
+                <div class="form-field">
+
+                    <label for="publisher_name">
+                        Publisher
+                    </label>
+
+                    <input
+                   type="text"
+                    id="publisher_name"
+                    name="publisher_name"
+                    value="{{ book.publisher_name or '' }}"
+                    placeholder="Penguin Random House"
+                    >
+
+                </div>
+
+                <!-- Cover Image -->
+                <div class="form-field form-field-full">
+
+                    <label for="cover_image">
+                        Cover Image
+                    </label>
+
+                    <input
+                        type="file"
+                        id="cover_image"
+                        name="cover_image"
+                        accept=".jpg,.jpeg,.png,.webp"
+                    >
+
+                    <span class="form-field-hint">
+                        Leave empty to keep the current cover.
+                    </span>
+
+                </div>
+
+
+                <!-- Description -->
+                <div class="form-field form-field-full">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="6"
+                    >{{ book.description or '' }}</textarea>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="form-section">
+
+            <div class="form-section-heading">
+                <span>02</span>
+                <div>
+                    <h2>Authors & Genres</h2>
+                    <p>Use Command-click on macOS or Control-click on Windows to select several.</p>
+                </div>
+            </div>
+
+            <div class="relation-grid">
+
+                <div class="relation-group">
+                    <h3>Existing Authors</h3>
+                    <div class="form-field">
+                        <label for="existing_author_ids">Authors</label>
+                        <select id="existing_author_ids" name="existing_author_ids" multiple size="8">
+                            {% for author in authors %}
+                                <option
+                                    value="{{ author.author_id }}"
+                                    {% if author.author_id in selected_author_ids %}selected{% endif %}
+                                >
+                                    {{ author.first_name }} {{ author.last_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="new-relation">
+                        <span class="new-relation-label">Or add another author</span>
+                        <div class="mini-grid">
+                            <div class="form-field">
+                                <label for="author_first_name">First Name</label>
+                                <input type="text" id="author_first_name" name="author_first_name" placeholder="Donna">
+                            </div>
+                            <div class="form-field">
+                                <label for="author_last_name">Last Name</label>
+                                <input type="text" id="author_last_name" name="author_last_name" placeholder="Tartt">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relation-group">
+                    <h3>Existing Genres</h3>
+                    <div class="form-field">
+                        <label for="existing_genre_ids">Genres</label>
+                        <select id="existing_genre_ids" name="existing_genre_ids" multiple size="8">
+                            {% for genre in genres %}
+                                <option
+                                    value="{{ genre.genre_id }}"
+                                    {% if genre.genre_id in selected_genre_ids %}selected{% endif %}
+                                >
+                                    {{ genre.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="new-relation">
+                        <span class="new-relation-label">Or add another genre</span>
+                        <div class="form-field">
+                            <label for="genre_name">Genre Name</label>
+                            <input type="text" id="genre_name" name="genre_name" placeholder="Dark Academia">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="form-section">
+
+            <div class="form-section-heading">
+                <span>03</span>
+                <div>
+                    <h2>Physical Copy</h2>
+                    <p>Update the copy you own, or add copy information if none is recorded.</p>
+                </div>
+            </div>
+
+            {% if copy_count > 1 %}
+                <p class="form-notice">
+                    This title has {{ copy_count }} copies. This form edits the first copy only.
+                </p>
+            {% endif %}
+
+            <input type="hidden" name="copy_id" value="{{ copy.copy_id if copy else '' }}">
+
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="shelf_id">Existing Shelf</label>
+                    <select id="shelf_id" name="shelf_id">
+                        <option value="">No shelf assigned</option>
+                        {% for shelf in shelves %}
+                            <option
+                                value="{{ shelf.shelf_id }}"
+                                {% if copy and copy.shelf_id == shelf.shelf_id %}selected{% endif %}
+                            >
+                                {{ shelf.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="new_shelf_name">Or Add New Shelf</label>
+                    <input type="text" id="new_shelf_name" name="new_shelf_name" placeholder="Living Room Shelf">
+                </div>
+
+                <div class="form-field">
+                    <label for="format">Format</label>
+                    <select id="format" name="format">
+                        <option value="">No physical copy</option>
+                        {% for format_name in ['Hardcover', 'Paperback', 'Mass Market Paperback', 'Audiobook', 'Other'] %}
+                            <option
+                                value="{{ format_name }}"
+                                {% if copy and copy.format == format_name %}selected{% endif %}
+                            >
+                                {{ format_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="condition">Condition</label>
+                    <select id="condition" name="condition">
+                        <option value="">Select condition</option>
+                        {% for condition_name in ['New', 'Like New', 'Good', 'Fair', 'Poor'] %}
+                            <option
+                                value="{{ condition_name }}"
+                                {% if copy and copy.condition == condition_name %}selected{% endif %}
+                            >
+                                {{ condition_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="purchase_date">Purchase Date</label>
+                    <input
+                        type="date"
+                        id="purchase_date"
+                        name="purchase_date"
+                        value="{{ copy.purchase_date if copy and copy.purchase_date else '' }}"
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="purchase_price">Purchase Price</label>
+                    <input
+                        type="number"
+                        id="purchase_price"
+                        name="purchase_price"
+                        step="0.01"
+                        min="0"
+                        value="{{ copy.purchase_price if copy and copy.purchase_price is not none else '' }}"
+                    >
+                </div>
+
+                <div class="form-field form-field-full">
+                    <label for="copy_notes">Copy Notes</label>
+                    <textarea id="copy_notes" name="copy_notes" rows="4">{{ copy.notes if copy and copy.notes else '' }}</textarea>
+                </div>
+            </div>
+
+        </section>
+
+
+        <div class="book-form-actions">
+
+            <a
+                href="{{ url_for('book_details', book_id=book.book_id) }}"
+                class="form-cancel"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="form-submit"
+            >
+                Save Changes
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ author.first_name }} {{ author.last_name }} | My Bookshelf
+{% endblock %}
+
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/author-details.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<section class="author-profile-page">
+
+    <div class="author-profile-container">
+
+
+        <!-- Back Link -->
+        <a
+            href="{{ url_for('authors') }}"
+            class="author-back"
+        >
+            ← All Authors
+        </a>
+
+
+        <!-- Author Profile -->
+        <section class="author-profile">
+
+            <div class="author-portrait">
+
+                <span class="author-initials">
+                    {{ author.first_name[0] }}{{ author.last_name[0] }}
+                </span>
+
+            </div>
+
+
+            <!-- Author Information -->
+            <div class="author-profile-info">
+
+                <p class="author-eyebrow">
+                    AUTHOR PROFILE
+                </p>
+
+
+                <h1>
+                    {{ author.first_name }}
+                    {{ author.last_name }}
+                </h1>
+
+
+                {% if author.bio %}
+
+                    <p class="author-biography">
+                        {{ author.bio }}
+                    </p>
+
+                {% else %}
+
+                    <p class="author-biography author-biography-empty">
+                        No biography has been added for this author.
+                    </p>
+
+                {% endif %}
+
+
+                <!-- Author Statistics -->
+                <div class="author-stats">
+
+                    <div class="author-stat">
+
+                        <span class="author-stat-number">
+                            {{ books|length }}
+                        </span>
+
+                        <span class="author-stat-label">
+                            {% if books|length == 1 %}
+                                Book in Library
+                            {% else %}
+                                Books in Library
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Collected Works -->
+        <section class="author-books">
+
+            <div class="author-books-header">
+
+                <div>
+
+                    <p class="author-books-eyebrow">
+                        THE COLLECTION
+                    </p>
+
+                    <h2>Collected Works</h2>
+
+                </div>
+
+
+                <span class="author-books-count">
+
+                    {{ books|length }}
+
+                    {% if books|length == 1 %}
+                        title
+                    {% else %}
+                        titles
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+            {% if books %}
+
+                <div class="author-book-grid">
+
+                    {% for book in books %}
+
+                        <a
+                            href="{{ url_for('book_details', book_id=book.book_id) }}"
+                            class="author-book"
+                        >
+
+                            <div class="author-book-cover">
+
+                                {% if book.cover_image %}
+
+                                    <img
+                                        src="{{ url_for('static', filename=book.cover_image) }}"
+                                        alt="Cover of {{ book.title }}"
+                                    >
+
+                                {% else %}
+
+                                    <div class="author-book-placeholder">
+
+                                        <span>
+                                            {{ book.title }}
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="author-book-info">
+
+                                <h3>
+                                    {{ book.title }}
+                                </h3>
+
+                                {% if book.publication_year %}
+
+                                    <p>
+                                        {{ book.publication_year }}
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+                        </a>
+
+                    {% endfor %}
+
+                </div>
+
+                <div class="author-shelf-line"></div>
+
+            {% else %}
+
+                <div class="author-books-empty">
+
+                    <p>
+                        No books by this author are currently
+                        in your library.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+</section>
+
+{% endblock %}

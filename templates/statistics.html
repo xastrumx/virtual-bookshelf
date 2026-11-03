@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}Home | My Bookshelf{% endblock %}
+
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/home.css') }}"
+>
+{% endblock %}
+
+
+{% block content %}
+
+<section class="home-page">
+
+    <div class="home-container">
+
+        <header class="home-hero">
+
+            <div class="home-hero-text">
+
+                <p class="home-eyebrow">
+                    PERSONAL LIBRARY
+                </p>
+
+                <h1 class="page-title">
+                    Your Library at a Glance
+                </h1>
+
+            </div>
+
+        </header>
+
+
+        <!-- STATS -->
+        <section class="home-section">
+
+            <div class="section-heading">
+
+                <p class="section-label">
+                    LIBRARY INSIGHTS
+                </p>
+
+                <h2>
+                    The Collection
+                </h2>
+            </div>
+
+
+            <div class="stat-grid">
+
+                <div class="stat-item">
+
+                    <span class="stat-number">
+                        {{ total_books }}
+                    </span>
+
+                    <span class="stat-label">
+                        Books
+                    </span>
+                </div>
+
+
+                <div class="stat-item">
+                    <span class="stat-number">
+                        {{ total_copies }}
+                    </span>
+
+                    <span class="stat-label">
+                        Physical Copies
+                    </span>
+                </div>
+
+
+                <div class="stat-item">
+                    <span class="stat-number">
+                        {{ total_authors }}
+                    </span>
+
+                    <span class="stat-label">
+                        Authors
+                    </span>
+                </div>
+
+
+                <div class="stat-item">
+                    <span class="stat-number">
+                        {{ total_genres }}
+                    </span>
+
+                    <span class="stat-label">
+                        Genres
+                    </span>
+                </div>
+
+
+                <div class="stat-item">
+                    <span class="stat-number">
+                        {{ total_publishers }}
+                    </span>
+
+                    <span class="stat-label">
+                        Publishers
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- COLLECTION HIGHLIGHTS -->
+        <section class="home-section">
+
+            <div class="section-heading">
+
+                <p class="section-label">
+                    COLLECTION DETAILS
+                </p>
+
+                <h2>
+                    Library Highlights
+                </h2>
+            </div>
+
+
+            <div class="highlight-grid">
+
+                <div class="highlight-card">
+
+                    <span class="highlight-label">
+                        Most Collected Genre
+                    </span>
+
+                    <span class="highlight-value">
+                        {% if most_common_genre %}
+                            {{ most_common_genre.name }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </span>
+
+                    {% if most_common_genre %}
+
+                        <span class="highlight-detail">
+                            {{ most_common_genre.book_count }}
+                            {% if most_common_genre.book_count == 1 %}
+                                book
+                            {% else %}
+                                books
+                            {% endif %}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="highlight-card">
+                    
+                    <span class="highlight-label">
+                        Most Populated Shelf
+                    </span>
+
+                    <span class="highlight-value">
+                        {% if most_populated_shelf %}
+                            {{ most_populated_shelf.name }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </span>
+
+                    {% if most_populated_shelf %}
+
+                        <span class="highlight-detail">
+                            {{ most_populated_shelf.copy_count }}
+                            {% if most_populated_shelf.copy_count == 1 %}
+                                copy
+                            {% else %}
+                                copies
+                            {% endif %}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="highlight-card">
+
+                    <span class="highlight-label">
+                        Collection Value
+                    </span>
+
+                    <span class="highlight-value">
+                        ${{ "%.2f"|format(total_spent) }}
+                    </span>
+
+                    <span class="highlight-detail">
+                        Total spent
+                    </span>
+
+                </div>
+
+                <div class="highlight-card">
+
+                    <span class="highlight-label">
+                        Average Book Price
+                    </span>
+
+                    <span class="highlight-value">
+                        ${{ "%.2f"|format(average_price) }}
+                    </span>
+
+                    <span class="highlight-detail">
+                        Per physical copy
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- BREAKDOWNS -->
+        <section class="home-section">
+
+            <div class="section-heading">
+
+                <p class="section-label">
+                    COLLECTION BREAKDOWN
+                </p>
+
+                <h2>
+                    Inside Your Library
+                </h2>
+
+            </div>
+
+            <div class="breakdown-grid">
+
+                <!-- Genres -->
+                <div class="breakdown-panel">
+
+                    <div class="breakdown-header">
+                        <h3>Books by Genre</h3>
+                    </div>
+
+                    <div class="breakdown-list">
+
+                        {% for genre in books_per_genre %}
+
+                            <div class="breakdown-item">
+
+                                <div class="breakdown-info">
+
+                                    <span>
+                                        {{ genre.name }}
+                                    </span>
+
+                                    <span>
+                                        {{ genre.book_count }}
+                                    </span>
+
+                                </div>
+
+                                <div class="breakdown-bar">
+
+                                    <div
+                                        class="breakdown-fill"
+                                        data-percent="
+                                            width:
+                                            {% if total_books > 0 %}
+                                                {{ (genre.book_count / total_books * 100) | round(2) }}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        "
+                                    >
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <!-- Shelves -->
+                <div class="breakdown-panel">
+
+                    <div class="breakdown-header">
+                        <h3>Copies by Shelf</h3>
+                    </div>
+
+
+                    <div class="breakdown-list">
+
+                        {% for shelf in copies_per_shelf %}
+
+                            <div class="breakdown-item">
+
+                                <div class="breakdown-info">
+
+                                    <span>
+                                        {{ shelf.name }}
+                                    </span>
+
+                                    <span>
+                                        {{ shelf.copy_count }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="breakdown-bar">
+
+                                    <div
+                                        class="breakdown-fill"
+                                        data-percent="
+                                            width:
+                                            {% if total_copies > 0 %}
+                                                {{ (shelf.copy_count / total_copies * 100) | round(2) }}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        "
+                                    >
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+
+                <!-- Formats -->
+                <div class="breakdown-panel">
+
+                    <div class="breakdown-header">
+                        <h3>Copies by Format</h3>
+                    </div>
+
+
+                    <div class="breakdown-list">
+
+                        {% for format in copies_per_format %}
+
+                            <div class="breakdown-item">
+
+                                <div class="breakdown-info">
+
+                                    <span>
+                                        {{ format.format }}
+                                    </span>
+
+                                    <span>
+                                        {{ format.copy_count }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="breakdown-bar">
+
+                                    <div
+                                        class="breakdown-fill"
+                                        data-percent="
+                                            width:
+                                            {% if total_copies > 0 %}
+                                                {{ (format.copy_count / total_copies * 100) | round(2) }}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        "
+                                    >
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    document.querySelectorAll(".breakdown-fill").forEach((bar) => {
+        const percent = parseFloat(bar.dataset.percent) || 0;
+
+        bar.style.width = `${Math.min(percent, 100)}%`;
+    });
+</script>
+
+{% endblock %}

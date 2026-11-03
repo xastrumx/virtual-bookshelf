@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}
+Bookshelf | Virtual Bookshelf
+{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/bookshelf.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<section class="bookshelf-page">
+
+    <!-- Page Header -->
+    <header class="bookshelf-header">
+
+        <p class="bookshelf-eyebrow">
+            YOUR COLLECTION
+        </p>
+
+        <h1 class="page-title">
+            My Bookshelf
+        </h1>
+
+    </header>
+
+
+    <!-- Shelves -->
+    <div class="bookshelf-collection">
+
+        {% if shelves %}
+
+            {% for shelf in shelves %}
+
+                <section class="virtual-shelf">
+
+                    <!-- Shelf Heading -->
+                    <div class="virtual-shelf-header">
+
+                        <h2 class="virtual-shelf-title">
+                            {{ shelf.shelf_name }}
+                        </h2>
+
+                        <span class="virtual-shelf-count">
+                            {{ shelf.books|length }}
+                            {% if shelf.books|length == 1 %}
+                                BOOK
+                            {% else %}
+                                BOOKS
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+
+                    <!-- Books -->
+                    <div class="virtual-shelf-books">
+
+                        {% if shelf.books %}
+
+                            {% for book in shelf.books %}
+
+                                <a
+                                    class="shelf-book"
+                                    href="{{ url_for('book_details', book_id=book.book_id) }}"
+                                    aria-label="View {{ book.title }}"
+                                >
+
+                                    {% if book.cover_image %}
+
+                                        <img
+                                            src="{{ url_for('static', filename=book.cover_image) }}"
+                                            alt="Cover of {{ book.title }}"
+                                            class="shelf-book-cover"
+                                        >
+
+                                    {% else %}
+
+                                        <div class="shelf-book-placeholder">
+
+                                            <span>
+                                                {{ book.title }}
+                                            </span>
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    <!-- Hover Info -->
+                                    <div class="shelf-book-info">
+
+                                        <span class="shelf-book-title">
+                                            {{ book.title }}
+                                        </span>
+
+                                    </div>
+
+                                </a>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <div class="virtual-shelf-empty">
+
+                                <p>
+                                    No books on this shelf yet.
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Physical Shelf -->
+                    <div class="shelf-ledge"></div>
+
+                </section>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="bookshelf-empty">
+
+                <h2>Your bookshelf is empty.</h2>
+
+                <p>
+                    Add books to your collection to begin filling your shelves.
+                </p>
+
+                <a
+                    href="{{ url_for('add_book') }}"
+                    class="bookshelf-empty-link"
+                >
+                    Add Your First Book
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

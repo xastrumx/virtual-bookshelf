@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Authors | My Bookshelf{% endblock %}
+
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/authors.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<section class="authors-page">
+
+    <div class="authors-container">
+
+
+        <!-- Page Header -->
+        <header class="authors-header">
+
+            <div>
+
+                <p class="authors-eyebrow">
+                    THE COLLECTION
+                </p>
+
+                <h1 class="page-title">Authors</h1>
+
+            </div>
+
+            <div class="authors-count">
+                <span class="authors-count-number">
+                    {{ authors|length }}
+                </span>
+
+                <span class="authors-count-label">
+                    Authors
+                </span>
+            </div>
+
+        </header>
+
+
+        <!-- Author List -->
+        <section class="authors-list">
+
+            {% if authors %}
+
+                {% for author in authors %}
+
+                    <a
+                        href="{{ url_for('author_details', author_id=author.author_id)}}"
+                        class="author-entry"
+                    >
+
+                        <div class="author-number">
+                            {{ "%02d"|format(loop.index) }}
+                        </div>
+
+                        <div class="author-name">
+
+                            <span class="author-first-name">
+                                {{ author.first_name }}
+                            </span>
+
+                            <span class="author-last-name">
+                                {{ author.last_name }}
+                            </span>
+
+                        </div>
+
+                        <span class="author-arrow">
+                            →
+                        </span>
+
+                    </a>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="authors-empty">
+
+                    <h2>No authors yet.</h2>
+
+                    <p>
+                        Authors will appear here after books
+                        are added to your library.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+</section>
+
+{% endblock %}
