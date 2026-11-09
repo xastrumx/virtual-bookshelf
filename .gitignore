@@ -1,13 +1,22 @@
 # Local environment and secrets
 .env*
 !.env.example
+.flaskenv
 .direnv/
+credentials*.json
+service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Python virtual environments
 .venv/
 venv/
 env/
 ENV/
+.python-version
+__pypackages__/
 
 # Python caches and generated files
 __pycache__/
@@ -35,11 +44,14 @@ instance/
 
 # Logs and local database/backups
 *.log
+*.pid
 *.sqlite
 *.sqlite3
 *.db
 *.dump
 *.backup
+*.bak
+*.orig
 *.sql.gz
 
 # Editors and operating systems
@@ -50,6 +62,9 @@ instance/
 *~
 .DS_Store
 Thumbs.db
+
+# Private local documentation
+README.local.md
 
 # Uploaded covers contain personal library data. Back them up separately.
 static/covers/*

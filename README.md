@@ -1,27 +1,40 @@
 # Virtual Bookshelf
 
-A private, single-user Flask application for cataloging a personal book collection in PostgreSQL.
+Virtual Bookshelf is a full-stack Flask application for cataloging, organizing, and exploring a physical book collection. It combines detailed collection management with a visual, responsive interface backed by PostgreSQL.
 
-## Current features
+## Highlights
 
 - Add, view, edit, and delete books
-- Store one or more authors and genres per book
-- Track a physical copy's shelf, format, condition, purchase details, and notes
-- Upload cover images
-- Search, filter, sort, and paginate the library
-- Browse authors and a visual bookshelf
-- View collection statistics
+- Associate multiple authors and genres with each title
+- Track shelf location, format, condition, purchase details, and personal notes
+- Upload and display custom cover images
+- Search, filter, sort, and paginate the collection
+- Browse dedicated author pages and a visual bookshelf
+- Explore collection statistics across genres, shelves, formats, and spending
 
-This project intentionally has no accounts or login system. Run it only on your own computer. If it is ever exposed to a local network or the internet, add authentication first.
+## Tech stack
 
-## Local setup
+- **Backend:** Python, Flask, Psycopg
+- **Database:** PostgreSQL
+- **Frontend:** Jinja templates, HTML, CSS, and JavaScript
 
-Requirements:
+## Getting started
+
+### Prerequisites
 
 - Python 3.11 or newer
 - PostgreSQL
 
-Create and activate a virtual environment, then install dependencies:
+### Installation
+
+Clone the repository and enter the project directory:
+
+```bash
+git clone https://github.com/xastrumx/virtual-bookshelf.git
+cd virtual-bookshelf
+```
+
+Create a virtual environment and install the dependencies:
 
 ```bash
 python3 -m venv .venv
@@ -29,13 +42,13 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Copy the environment template and enter the credentials for your local PostgreSQL database:
+Create the local environment file from the included template:
 
 ```bash
 cp .env.example .env
 ```
 
-For a new, empty database, apply the included schema:
+Update `.env` with the credentials for your PostgreSQL database, then apply the schema:
 
 ```bash
 psql -d virtual_bookshelf -f schema.sql
@@ -44,44 +57,35 @@ psql -d virtual_bookshelf -f schema.sql
 Start the application:
 
 ```bash
-source .venv/bin/activate
 python app.py
 ```
 
-Open [http://127.0.0.1:5000](http://127.0.0.1:5000). The development server binds to this computer only by default.
+Open [http://127.0.0.1:5000](http://127.0.0.1:5000) in a browser.
 
-## Backups
+## Project structure
 
-The collection has two parts, and both must be backed up:
-
-1. PostgreSQL data
-2. Uploaded covers in `static/covers`
-
-Example database backup:
-
-```bash
-pg_dump -Fc -d virtual_bookshelf -f virtual_bookshelf.dump
+```text
+virtual-bookshelf/
+├── app.py             # Application routes and collection workflows
+├── db.py              # PostgreSQL connection management
+├── schema.sql         # Relational database schema
+├── templates/         # Jinja page templates
+├── static/css/        # Page and component styles
+└── static/covers/     # Local user-uploaded covers
 ```
 
-Example database restore into an empty database:
+## Privacy and local data
 
-```bash
-pg_restore --clean --if-exists -d virtual_bookshelf virtual_bookshelf.dump
-```
+The repository contains a data-free schema and placeholder environment values only. Local database credentials, database exports, uploaded covers, virtual environments, caches, and private notes are excluded through `.gitignore`. Keep those files local and never force-add them to version control.
 
-Copy the entire `static/covers` directory into the same backup location as the database dump. Keep backups outside this project folder, ideally in a location that is itself backed up.
+## Security note
 
-## Personal-use maintenance
+Virtual Bookshelf is designed as a single-user local application and does not currently include authentication. Add an authentication layer and production-ready deployment configuration before exposing a running instance to a network or the public internet.
 
-- Keep `.env` private; it contains the database password.
-- Leave `FLASK_DEBUG=false` for normal use.
-- Back up the database and cover directory after large cataloging sessions.
-- Run `python -m py_compile app.py db.py` after code changes for a quick syntax check.
+## Future improvements
 
-## Optional future improvements
-
-- Manage multiple physical copies of one title independently
-- Add automated tests
-- Add cover removal/replacement controls
-- Continue responsive and accessibility polish
-- Add authentication only if the app becomes shared or remotely accessible
+- Support independently managed copies of the same title
+- Add automated test coverage
+- Add cover replacement and removal controls
+- Continue responsive-design and accessibility improvements
+- Add authentication for shared or hosted deployments
